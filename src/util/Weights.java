@@ -1,5 +1,7 @@
 package util;
 
+import java.util.Arrays;
+
 public class Weights {
     private int[][] gray2dArray;
     private double[][] vertexWithEdge2dArray;
@@ -48,15 +50,53 @@ public class Weights {
         return sum / (gray2dArray.length * gray2dArray[0].length);
     }
 
+    public double sumOfAllWeights() {
+        double sum = 0;
+        for (int y = 0; y < vertexWithEdge2dArray.length; y++) {
+            for (int x = 0; x < vertexWithEdge2dArray[0].length; x++) {
+                if (y % 2 == 0 && x % 2 == 1) {
+                    sum += vertexWithEdge2dArray[y][x];
+                } else if (y % 2 == 1 && x % 2 == 0) {
+                    sum += vertexWithEdge2dArray[y][x];
+                }
+            }
+        }
+        return sum;
+    }
+
+    public double[] allWeights() {
+        double[] weights = new double[2 * gray2dArray.length * gray2dArray[0].length - (gray2dArray.length + gray2dArray[0].length)];
+        int index = 0;
+        for (int y = 0; y < vertexWithEdge2dArray.length; y++) {
+            for (int x = 0; x < vertexWithEdge2dArray[0].length; x++) {
+                if (y % 2 == 0 && x % 2 == 1) {
+                    weights[index++] = vertexWithEdge2dArray[y][x];
+                } else if (y % 2 == 1 && x % 2 == 0) {
+                    weights[index++] = vertexWithEdge2dArray[y][x];
+                }
+            }
+        }
+        Arrays.sort(weights);
+        return weights;
+    }
+
 
     public Weights(int[][] gray2dArray, double percentage) {
         this.gray2dArray = gray2dArray;
         this.mean = getMean();
         this.variance = getVariance();
         this.vertexWithEdge2dArray = convertGray2dArrayToVertexWithEdge2dArray();
-        double min = Math.exp(-Math.pow(MAX_GRAY_VALUE - MIN_GRAY_VALUE, 2) / variance);
-        double range = 1 - min;
-        this.threshold = min + range * percentage;
+//        double min = Math.exp(-Math.pow(MAX_GRAY_VALUE - MIN_GRAY_VALUE, 2) / variance);
+//        double range = 1 - min;
+//        this.threshold = min + range * percentage;
+        double allWeights = sumOfAllWeights();
+        this.threshold = allWeights / (2 * gray2dArray.length * gray2dArray[0].length - (gray2dArray.length + gray2dArray[0].length));
+//        threshold -=0.005;
+//        System.out.println(threshold);
+//        this.threshold=Math.exp(-225/variance);
+//        double[] weights = allWeights();
+//        System.out.println(weights.length);
+//        this.threshold = weights[weights.length/32*3-8];
 //        neighborClassify(threshold);
     }
 
